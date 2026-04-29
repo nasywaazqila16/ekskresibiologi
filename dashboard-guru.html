@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Dashboard Guru — BioEkskresi</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;font-family:"Plus Jakarta Sans",system-ui,sans-serif;}
+:root{
+  --white:#ffffff;--bg:#f4f6fa;--border:#e8ecf2;--text:#0d1117;--text2:#4a5568;--text3:#94a3b8;
+  --blue:#2563eb;--blue-l:#eff6ff;--blue-b:#bfdbfe;
+  --amber:#d97706;--amber-l:#fffbeb;--amber-b:#fde68a;
+  --teal:#0d9488;--teal-l:#f0fdfa;--teal-b:#99f6e4;
+  --rose:#be185d;--rose-l:#fff1f2;--rose-b:#fecdd3;
+  --green:#059669;--green-l:#f0fdf4;--green-b:#bbf7d0;
+  --purple:#7c3aed;--purple-l:#f5f3ff;--purple-b:#ddd6fe;
+}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+body{background:var(--bg);color:var(--text);min-height:100vh;}
+
+.topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:58px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 12px rgba(13,17,23,.06);}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.brand-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#1e40af,#2563eb,#0d9488);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.brand-name{font-size:15px;font-weight:800;color:var(--text);letter-spacing:-.3px;}
+.brand-name em{font-style:normal;color:var(--blue);}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.pill-live{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:99px;background:var(--green-l);border:1px solid var(--green-b);font-size:11.5px;font-weight:700;color:var(--green);}
+.dot-live{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,.4);}70%{box-shadow:0 0 0 6px transparent;}}
+.btn-top{display:inline-flex;align-items:center;gap:6px;padding:6px 13px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;transition:all .15s;}
+.btn-top:hover{border-color:var(--blue-b);color:var(--blue);background:var(--blue-l);}
+.btn-top.warn{border-color:var(--rose-b);background:var(--rose-l);color:var(--rose);}
+.btn-top.amber{border-color:var(--amber-b);background:var(--amber-l);color:var(--amber);}
+.main{max-width:1200px;margin:0 auto;padding:24px 28px 60px;}
+
+.hero-stats{background:linear-gradient(135deg,#1a3070,#2563eb,#0891b2,#0d9488);border-radius:20px;padding:28px 32px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;overflow:hidden;}
+.hero-stats::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.055) 1px,transparent 1px);background-size:22px 22px;}
+.hero-left{position:relative;z-index:1;}
+.hero-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;}
+.hero-sub{font-size:13px;color:rgba(255,255,255,.65);}
+.stat-row{display:flex;gap:4px;position:relative;z-index:1;}
+.stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:14px 20px;text-align:center;min-width:90px;transition:.2s;}
+.stat:hover{background:rgba(255,255,255,.2);}
+.stat-val{font-size:26px;font-weight:900;color:#fff;line-height:1;}
+.stat-lbl{font-size:10px;font-weight:600;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.8px;margin-top:3px;}
+
+.filter-bar{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 1px 6px rgba(13,17,23,.04);}
+.filter-label{font-size:10.5px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;white-space:nowrap;}
+.filter-sep{width:1px;height:22px;background:var(--border);flex-shrink:0;}
+.fbtn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:8px;font-size:12px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;transition:.15s;white-space:nowrap;}
+.fbtn:hover{border-color:var(--blue-b);color:var(--blue);background:var(--blue-l);}
+.fbtn.on{color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+.fbtn[data-organ="all"].on,.fbtn[data-fase="all"].on{background:linear-gradient(135deg,#1e40af,#2563eb);}
+.fbtn[data-organ="Ginjal"].on{background:linear-gradient(135deg,#1e40af,#2563eb);}
+.fbtn[data-organ="Hati"].on{background:linear-gradient(135deg,#92400e,#d97706);}
+.fbtn[data-organ="Paru-Paru"].on{background:linear-gradient(135deg,#0c4a6e,#0284c7);}
+.fbtn[data-organ="Kulit"].on{background:linear-gradient(135deg,#831843,#be185d);}
+.fbtn[data-fase="1"].on{background:linear-gradient(135deg,#1e40af,#2563eb);}
+.fbtn[data-fase="2"].on{background:linear-gradient(135deg,#5b21b6,#7c3aed);}
+.fbtn[data-fase="3"].on{background:linear-gradient(135deg,#0f766e,#0d9488);}
+.fbtn[data-fase="4"].on{background:linear-gradient(135deg,#92400e,#d97706);}
+.fbtn[data-fase="5"].on{background:linear-gradient(135deg,#065f46,#059669);}
+.search-wrap{position:relative;flex:1;max-width:260px;}
+.search-input{width:100%;font-size:13px;color:var(--text);background:#f8fafc;border:1.5px solid var(--border);border-radius:9px;padding:7px 12px 7px 32px;outline:none;transition:.15s;}
+.search-input:focus{border-color:var(--blue-b);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.07);}
+.search-icon{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:13px;}
+
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+.kpi-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px 16px;display:flex;align-items:center;gap:11px;box-shadow:0 1px 5px rgba(13,17,23,.04);transition:.2s;}
+.kpi-card:hover{border-color:var(--blue-b);}
+.kpi-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.kpi-num{font-size:22px;font-weight:900;line-height:1;}
+.kpi-desc{font-size:11px;color:var(--text3);font-weight:600;margin-top:2px;}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.section-title{font-size:11px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:2px;display:flex;align-items:center;gap:8px;}
+.section-title::after{content:"";width:50px;height:1.5px;background:var(--blue-b);}
+
+.organ-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;}
+.organ-card{border-radius:14px;padding:14px 16px;border:1.5px solid;}
+.oc-g{background:var(--blue-l);border-color:var(--blue-b);}
+.oc-h{background:var(--amber-l);border-color:var(--amber-b);}
+.oc-p{background:#f0f9ff;border-color:#bae6fd;}
+.oc-k{background:var(--rose-l);border-color:var(--rose-b);}
+.oc-name{font-size:13px;font-weight:800;margin-bottom:4px;}
+.oc-g .oc-name{color:#1d4ed8;}.oc-h .oc-name{color:#92400e;}.oc-p .oc-name{color:#0c4a6e;}.oc-k .oc-name{color:#9d174d;}
+.oc-pips{display:flex;gap:3px;margin-bottom:5px;}
+.oc-pip{height:4px;flex:1;border-radius:2px;background:rgba(0,0,0,.08);}
+.oc-stat{font-size:11px;color:var(--text3);}
+
+.prog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:9px;margin-bottom:22px;}
+.prog-card{background:#fff;border:1px solid var(--border);border-radius:13px;padding:13px 15px;box-shadow:0 1px 5px rgba(13,17,23,.04);transition:.2s;}
+.prog-card:hover{border-color:var(--blue-b);transform:translateY(-1px);}
+.prog-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:9px;}
+.prog-kelompok{font-size:13px;font-weight:800;}
+.prog-organ{font-size:11px;color:var(--text3);margin-top:1px;}
+.prog-score{font-size:13px;font-weight:800;}
+.prog-pips{display:flex;gap:4px;}
+.pip{height:5px;flex:1;border-radius:3px;background:#f1f5f9;transition:.3s;}
+
+.jawaban-list{display:flex;flex-direction:column;gap:9px;}
+.jcard{background:#fff;border:1.5px solid var(--border);border-radius:17px;overflow:hidden;box-shadow:0 1px 7px rgba(13,17,23,.05);transition:.2s;}
+.jcard:hover{border-color:var(--blue-b);}
+.jcard.open{border-color:var(--blue-b);}
+.jhead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;gap:12px;transition:.15s;}
+.jhead:hover{background:#f8faff;}
+.jcard.open .jhead{background:#eff6ff;border-bottom:1.5px solid var(--blue-b);}
+.jhead-left{display:flex;align-items:center;gap:11px;}
+.java{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+.jname{font-size:14px;font-weight:800;}
+.jmeta{font-size:11.5px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:5px;}
+.jhead-right{display:flex;align-items:center;gap:6px;}
+.chip-fase{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:10.5px;font-weight:700;}
+.cf1{background:var(--blue-l);color:#1d4ed8;}.cf2{background:var(--purple-l);color:#5b21b6;}.cf3{background:var(--teal-l);color:#0f766e;}.cf4{background:var(--amber-l);color:#92400e;}.cf5{background:var(--green-l);color:#065f46;}
+.chip-organ{display:inline-flex;padding:3px 8px;border-radius:6px;font-size:10.5px;font-weight:700;}
+.co-g{background:var(--blue-l);color:#1d4ed8;}.co-h{background:var(--amber-l);color:#92400e;}.co-p{background:#f0f9ff;color:#0c4a6e;}.co-k{background:var(--rose-l);color:#9d174d;}
+.toggle-ic{width:26px;height:26px;border-radius:7px;background:#f1f5f9;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);transition:.2s;}
+.jcard.open .toggle-ic{background:var(--blue-l);border-color:var(--blue-b);color:var(--blue);transform:rotate(180deg);}
+.jbody{display:none;padding:20px;}
+.jcard.open .jbody{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.fase-block{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--border);}
+.fase-block:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+.fase-head{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.fase-badge{display:inline-flex;padding:5px 12px;border-radius:8px;font-size:11.5px;font-weight:700;color:#fff;}
+.fase-time{font-size:11px;color:var(--text3);}
+.qa-grid{display:grid;gap:11px;}
+.qa-q{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+.qa-q::before{content:"";width:2.5px;height:10px;border-radius:2px;background:var(--blue);flex-shrink:0;}
+.qa-a{font-size:13.5px;color:var(--text2);line-height:1.8;background:#f8fafc;border:1.5px solid var(--border);border-left:3px solid var(--blue);border-radius:9px;padding:10px 13px;white-space:pre-wrap;word-break:break-word;}
+.qa-a.empty{color:var(--text3);font-style:italic;border-left-color:var(--border);}
+.qa-a.f2{border-left-color:#7c3aed;}.qa-a.f3{border-left-color:#0d9488;}.qa-a.f4{border-left-color:#d97706;}.qa-a.f5{border-left-color:#059669;}
+.qa-table-wrap{overflow-x:auto;border-radius:9px;border:1.5px solid var(--border);margin-top:4px;}
+.qa-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.qa-table th{background:#f8fafc;font-size:10px;font-weight:800;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:8px 11px;text-align:left;border-bottom:1.5px solid var(--border);}
+.qa-table td{padding:8px 11px;border-bottom:1px solid #f1f5f9;color:var(--text2);vertical-align:top;}
+.qa-table tr:last-child td{border-bottom:none;}
+.qa-table tr:hover td{background:#fafcff;}
+.state-box{background:#fff;border:1.5px dashed var(--border);border-radius:20px;padding:64px 24px;text-align:center;box-shadow:0 1px 5px rgba(13,17,23,.04);}
+.state-icon{font-size:38px;display:block;margin-bottom:14px;}
+.state-title{font-size:18px;font-weight:800;margin-bottom:8px;}
+.state-desc{font-size:13.5px;color:var(--text3);line-height:1.7;max-width:380px;margin:0 auto 20px;}
+.spinner{width:30px;height:30px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .65s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:var(--rose-l);border:1.5px solid var(--rose-b);border-radius:14px;padding:18px 20px;margin-top:16px;text-align:left;}
+.code-box{background:#1e293b;border-radius:10px;padding:14px 18px;font-family:monospace;font-size:12.5px;color:#7dd3fc;line-height:1.8;margin-top:10px;}
+.btn-action{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:none;margin-top:12px;}
+@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr);}.organ-summary{grid-template-columns:repeat(2,1fr);}.stat-row{display:grid;grid-template-columns:repeat(3,1fr);}.hero-stats{flex-direction:column;align-items:flex-start;}.main{padding:16px;}.topbar{padding:0 16px;}}
+</style>
+</head>
+<body>
+
+<nav class="topbar">
+  <div style="display:flex;align-items:center;gap:10px;">
+    <a href="index.html" class="btn-top">← Beranda</a>
+    <a href="index.html" class="brand">
+      <div class="brand-icon">🧬</div>
+      <div class="brand-name">Bio<em>Ekskresi</em></div>
+    </a>
+  </div>
+  <div class="topbar-right">
+    <div class="pill-live"><div class="dot-live"></div>Real-time</div>
+    <button class="btn-top amber" onclick="window._injectDemo()">🧪 Data Uji</button>
+    <button class="btn-top warn" onclick="window._clearData()">🗑️ Hapus Data</button>
+    <span class="btn-top" style="cursor:default;font-weight:700;">👩‍🏫 Dashboard Guru</span>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="hero-stats">
+    <div class="hero-left">
+      <div class="hero-title">📊 Pantau Jawaban Peserta Didik</div>
+      <div class="hero-sub">Semua jawaban LKPD masuk real-time · Kelas XI-I · Sistem Ekskresi</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-val" id="hs-total">–</div><div class="stat-lbl">Jawaban</div></div>
+      <div class="stat"><div class="stat-val" id="hs-kelompok">–</div><div class="stat-lbl">Kelompok</div></div>
+      <div class="stat"><div class="stat-val" id="hs-selesai">–</div><div class="stat-lbl">Selesai F5</div></div>
+    </div>
+  </div>
+  <div id="main-content">
+    <div class="state-box">
+      <div class="spinner"></div>
+      <div class="state-title">Menghubungkan ke Firebase...</div>
+      <div class="state-desc">Mengambil data jawaban secara real-time.</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getDatabase,ref,onValue,set,remove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const app=initializeApp({apiKey:"AIzaSyAVRUz17JObm2qPfcDGmrasgacRAthjDgM",authDomain:"bioekskresi.firebaseapp.com",databaseURL:"https://bioekskresi-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"bioekskresi",storageBucket:"bioekskresi.firebasestorage.app",messagingSenderId:"129115226512",appId:"1:129115226512:web:b9fa69270169ac6a527315"});
+const db=getDatabase(app);
+
+let allData=[],currentOrgan="all",currentFase="all";
+const FL=["","Orientasi Masalah","Organisasi Belajar","Penyelidikan","Pengembangan Hasil","Analisis & Evaluasi"];
+const FG=["","linear-gradient(135deg,#1e40af,#2563eb)","linear-gradient(135deg,#5b21b6,#7c3aed)","linear-gradient(135deg,#0f766e,#0d9488)","linear-gradient(135deg,#92400e,#d97706)","linear-gradient(135deg,#065f46,#059669)"];
+const PC=["","#2563eb","#7c3aed","#0d9488","#d97706","#059669"];
+const OG={Ginjal:"linear-gradient(135deg,#1e40af,#2563eb)",Hati:"linear-gradient(135deg,#92400e,#d97706)","Paru-Paru":"linear-gradient(135deg,#0c4a6e,#0284c7)",Kulit:"linear-gradient(135deg,#831843,#be185d)"};
+const OC={Ginjal:"co-g",Hati:"co-h","Paru-Paru":"co-p",Kulit:"co-k"};
+const FC=["","cf1","cf2","cf3","cf4","cf5"];
+
+const TO=setTimeout(()=>showError(),9000);
+onValue(ref(db,"jawaban"),snap=>{
+  clearTimeout(TO);
+  allData=flatten(snap.val());
+  updateStats();
+  allData.length?renderAll():showEmpty();
+},err=>{clearTimeout(TO);showError(err.message);});
+
+function flatten(raw){
+  if(!raw)return[];
+  const rows=[];
+  Object.entries(raw).forEach(([organ,ks])=>{
+    if(!ks||typeof ks!=="object")return;
+    Object.entries(ks).forEach(([kk,fs])=>{
+      if(!fs||typeof fs!=="object")return;
+      Object.entries(fs).forEach(([fk,d])=>{
+        if(!d)return;
+        rows.push({...d,organ:d.organ||organ,kelompok:d.kelompok||kk.replace("kelompok_",""),fase:parseInt(d.fase||fk.replace("fase_",""))||1});
+      });
+    });
+  });
+  return rows;
+}
+
+function updateStats(){
+  const ks=new Set(allData.map(r=>r.organ+"__"+r.kelompok));
+  const f5=new Set(allData.filter(r=>r.fase===5).map(r=>r.organ+"__"+r.kelompok));
+  document.getElementById("hs-total").textContent=allData.length;
+  document.getElementById("hs-kelompok").textContent=ks.size;
+  document.getElementById("hs-selesai").textContent=f5.size;
+}
+
+window._setOrgan=(btn,val)=>{document.querySelectorAll(".fbtn[data-organ]").forEach(b=>b.classList.remove("on"));btn.classList.add("on");currentOrgan=val;renderAll();};
+window._setFase=(btn,val)=>{document.querySelectorAll(".fbtn[data-fase]").forEach(b=>b.classList.remove("on"));btn.classList.add("on");currentFase=val==="all"?"all":parseInt(val);renderAll();};
+window._search=()=>renderAll();
+
+function getFiltered(){
+  const q=(document.getElementById("search-input")?.value||"").toLowerCase();
+  return allData.filter(r=>{
+    const oOk=currentOrgan==="all"||r.organ===currentOrgan;
+    const fOk=currentFase==="all"||r.fase===currentFase;
+    const sOk=!q||String(r.kelompok).includes(q)||JSON.stringify(r).toLowerCase().includes(q);
+    return oOk&&fOk&&sOk;
+  });
+}
+
+function renderAll(){
+  const fRows=getFiltered();
+  const fK=new Set(fRows.map(r=>r.organ+"__"+r.kelompok));
+  const fO=new Set(fRows.map(r=>r.organ));
+  const fF5=fRows.filter(r=>r.fase===5).length;
+  const ft=fRows.length?(fRows[fRows.length-1].timestamp||"–"):"–";
+
+  const groups={};
+  allData.forEach(r=>{const k=r.organ+"__"+r.kelompok;if(!groups[k])groups[k]={organ:r.organ,kelompok:r.kelompok,fases:new Set()};groups[k].fases.add(r.fase);});
+
+  const fg={};
+  fRows.forEach(r=>{const k=r.organ+"__K"+r.kelompok;if(!fg[k])fg[k]={organ:r.organ,kelompok:r.kelompok,rows:[]};fg[k].rows.push(r);});
+  const fc=Object.values(fg).sort((a,b)=>a.organ.localeCompare(b.organ)||String(a.kelompok).localeCompare(String(b.kelompok)));
+
+  const activeO=v=>`class="fbtn ${currentOrgan===v?"on":""}" data-organ="${v}"`;
+  const activeF=v=>`class="fbtn ${currentFase===v?"on":""}" data-fase="${v}"`;
+
+  document.getElementById("main-content").innerHTML=`
+  <div class="organ-summary">${renderOrgSum()}</div>
+  <div class="filter-bar">
+    <span class="filter-label">Organ</span>
+    <button ${activeO("all")} onclick="window._setOrgan(this,'all')">🌐 Semua</button>
+    <button ${activeO("Ginjal")} onclick="window._setOrgan(this,'Ginjal')">🫀 Ginjal</button>
+    <button ${activeO("Hati")} onclick="window._setOrgan(this,'Hati')">🟤 Hati</button>
+    <button ${activeO("Paru-Paru")} onclick="window._setOrgan(this,'Paru-Paru')">🫁 Paru</button>
+    <button ${activeO("Kulit")} onclick="window._setOrgan(this,'Kulit')">🫧 Kulit</button>
+    <div class="filter-sep"></div>
+    <span class="filter-label">Fase</span>
+    <button ${activeF("all")} onclick="window._setFase(this,'all')">Semua</button>
+    <button ${activeF(1)} onclick="window._setFase(this,1)">F1</button>
+    <button ${activeF(2)} onclick="window._setFase(this,2)">F2</button>
+    <button ${activeF(3)} onclick="window._setFase(this,3)">F3</button>
+    <button ${activeF(4)} onclick="window._setFase(this,4)">F4</button>
+    <button ${activeF(5)} onclick="window._setFase(this,5)">F5</button>
+    <div class="filter-sep"></div>
+    <div class="search-wrap"><span class="search-icon">🔍</span><input type="text" class="search-input" id="search-input" placeholder="Cari kelompok / jawaban..." oninput="window._search()"></div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-icon" style="background:var(--blue-l)">📝</div><div><div class="kpi-num">${fRows.length}</div><div class="kpi-desc">Jawaban</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:var(--green-l)">👥</div><div><div class="kpi-num">${fK.size}</div><div class="kpi-desc">Kelompok Aktif</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:var(--purple-l)">🏫</div><div><div class="kpi-num">${fO.size}</div><div class="kpi-desc">Organ</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:var(--amber-l)">✅</div><div><div class="kpi-num">${fF5}</div><div class="kpi-desc">Selesai F5</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:var(--rose-l)">⏱️</div><div><div class="kpi-num" style="font-size:13px">${String(ft).split(" ").pop()||"–"}</div><div class="kpi-desc">Terbaru</div></div></div>
+  </div>
+  <div class="section-head"><div class="section-title">Progress Kelompok</div></div>
+  <div class="prog-grid">${renderProg(groups)}</div>
+  <div class="section-head"><div class="section-title">${currentOrgan==="all"?"Semua Organ":currentOrgan} · ${currentFase==="all"?"Semua Fase":"Fase "+currentFase} · ${fc.length} kelompok</div></div>
+  <div class="jawaban-list">${fc.length?fc.map((g,i)=>renderJCard(g,i)).join(""):"<div class="state-box"><span class="state-icon">🔍</span><div class="state-title">Tidak ada data</div><div class="state-desc">Belum ada jawaban untuk filter ini.</div></div>"}</div>`;
+}
+
+function renderOrgSum(){
+  return["Ginjal","Hati","Paru-Paru","Kulit"].map(o=>{
+    const rows=allData.filter(r=>r.organ===o);
+    const ks=new Set(rows.map(r=>r.kelompok)).size;
+    const col={Ginjal:"#2563eb",Hati:"#d97706","Paru-Paru":"#0284c7",Kulit:"#be185d"}[o];
+    const pips=[1,2,3,4,5].map(f=>{const h=rows.some(r=>r.fase===f);return`<div class="oc-pip${h?" done":""}" style="${h?"background:"+col+";":""}"></div>`;}).join("");
+    const cls={Ginjal:"oc-g",Hati:"oc-h","Paru-Paru":"oc-p",Kulit:"oc-k"}[o];
+    return`<div class="organ-card ${cls}"><div class="oc-name">${o}</div><div class="oc-pips">${pips}</div><div class="oc-stat">${ks} kelompok · ${rows.length} jawaban</div></div>`;
+  }).join("");
+}
+
+function renderProg(groups){
+  const sorted=Object.values(groups).sort((a,b)=>a.organ.localeCompare(b.organ)||String(a.kelompok).localeCompare(String(b.kelompok)));
+  if(!sorted.length)return"<div style="color:var(--text3);font-size:13px;grid-column:1/-1">Belum ada data.</div>";
+  return sorted.map(g=>{
+    const col={Ginjal:"#2563eb",Hati:"#d97706","Paru-Paru":"#0284c7",Kulit:"#be185d"}[g.organ]||"#2563eb";
+    const done=g.fases.size;
+    const pips=[1,2,3,4,5].map(f=>`<div class="pip${g.fases.has(f)?" done":""}" style="${g.fases.has(f)?"background:"+PC[f]+";":""}"></div>`).join("");
+    return`<div class="prog-card"><div class="prog-top"><div><div class="prog-kelompok" style="color:${col}">Kelompok ${g.kelompok}</div><div class="prog-organ">${g.organ}</div></div><div class="prog-score" style="color:${done>=5?"var(--green)":"var(--text3)"}">${done}/5</div></div><div class="prog-pips">${pips}</div></div>`;
+  }).join("");
+}
+
+function renderJCard(grp,idx){
+  const grad=OG[grp.organ]||OG.Ginjal;
+  const cc=OC[grp.organ]||"co-g";
+  const done=grp.rows.length>=5;
+  const chips=grp.rows.sort((a,b)=>a.fase-b.fase).map(r=>`<span class="chip-fase ${FC[r.fase]}">F${r.fase}</span>`).join("");
+  return`<div class="jcard" id="jc${idx}">
+    <div class="jhead" onclick="window._toggleCard(${idx})">
+      <div class="jhead-left">
+        <div class="java" style="background:${grad}">K${grp.kelompok}</div>
+        <div><div class="jname">Kelompok ${grp.kelompok}</div><div class="jmeta"><span class="chip-organ ${cc}">${grp.organ}</span><span>·</span><span>${grp.rows.length} fase</span>${done?"<span style="color:var(--green);font-weight:700">✅ Selesai</span>":""}</div></div>
+      </div>
+      <div class="jhead-right">${chips}<div class="toggle-ic">▾</div></div>
+    </div>
+    <div class="jbody">${grp.rows.sort((a,b)=>a.fase-b.fase).map(r=>renderFase(r)).join("")}</div>
+  </div>`;
+}
+
+function renderFase(r){
+  const fi=r.fase,cls="f"+fi;
+  let h=`<div class="fase-block"><div class="fase-head"><div class="fase-badge" style="background:${FG[fi]}">Fase ${fi} — ${FL[fi]}</div><div class="fase-time">${r.timestamp||""}</div></div><div class="qa-grid">`;
+  if(fi===1){h+=qa("Fakta dari Kasus",r.fakta,cls);h+=qa("Rumusan Masalah",r.rumusan_masalah,cls);}
+  else if(fi===2){
+    h+=qa("Rumusan Masalah Dipilih",r.rumusan_pilih,cls);
+    if(r.organ==="Ginjal"){
+      h+=qaT("Struktur Sistem Urinaria",tryJ(r.struktur_urinaria)||tryJ(r.struktur_ginjal),["nama","fungsi"],["Nama","Fungsi"]);
+      h+=qaT("Struktur Nefron",nefArr(tryJ(r.struktur_nefron)),["no","nama"],["No","Nama"]);
+      h+=qaT("Tahapan Urin",tryJ(r.urine_tahapan),["tahapan","tempat","proses","hasil"],["Tahapan","Tempat","Proses","Hasil"]);
+      h+=qa("Dampak Gangguan",r.dampak_gangguan,cls);h+=qa("Alasan Hemodialisis",r.hemodialisis,cls);
+    }else if(r.organ==="Hati"){
+      const ltrs=["A","B","C","D","E","F","G","H","I","J"];
+      h+=qaT("Struktur Hati (A–J)",ltrs.map(l=>({huruf:l,nama:r["f2_hati"+l]||""})),["huruf","nama"],["Huruf","Nama Struktur"]);
+      h+=qa("Keterkaitan Gangguan dengan Gejala",r.keterkaitan_gejala,cls);
+      h+=qa("Pengaruh Kebiasaan Sehari-hari",r.kebiasaan_hati,cls);
+      h+=qa("Kesimpulan Progresivitas Kerusakan",r.progresi_hati,cls);
+    }else{
+      h+=qa("Struktur Organ",r.struktur_organ||r.struktur_paru||r.struktur_kulit,cls);
+      h+=qa("Mekanisme Ekskresi",r.mekanisme||r.mekanisme_co2||r.termoregulasi,cls);
+      h+=qa("Dampak Gangguan",r.dampak_gangguan,cls);
+    }
+  }else if(fi===3){
+    h+=qaT("Sumber Referensi",tryJ(r.sumber_referensi),["nama","url","info"],["Sumber","Tautan","Info"]);
+    h+=qa("Jawaban Rumusan Masalah",r.jawab_rumusan,cls);
+    h+=qa("Keterkaitan Gejala & Gangguan",r.keterkaitan,cls);
+    h+=qa("Solusi Pencegahan & Penanganan",r.solusi,cls);
+  }else if(fi===4){
+    h+=qaT("Tanya Jawab",tryJ(r.tanya_jawab),["kelompok","pertanyaan","jawaban"],["Kelompok","Pertanyaan","Jawaban"]);
+    h+=qaT("Tanggapan untuk Kelompok Lain",tryJ(r.tanggapan),["kelompok","isi"],["Kelompok","Tanggapan"]);
+  }else if(fi===5){
+    h+=qa("Refleksi 1 — Konsep Baru",r.refleksi1,cls);
+    h+=qa("Refleksi 2 — Kaitkan Hidupmu",r.refleksi2,cls);
+    h+=qa("Refleksi 3 — Proses Belajar",r.refleksi3,cls);
+    h+=qa("Kelebihan Solusi",r.kelebihan,cls);
+    h+=qa("Kekurangan Solusi",r.kekurangan,cls);
+  }
+  return h+"</div></div>";
+}
+
+function qa(label,val,cls=""){const e=!val||!String(val).trim();return`<div><div class="qa-q">${label}</div><div class="qa-a ${cls} ${e?"empty":""}">${e?"Belum diisi":esc(String(val))}</div></div>`;}
+function qaT(label,rows,keys,headers){if(!rows?.length)return qa(label,"");return`<div><div class="qa-q">${label}</div><div class="qa-table-wrap"><table class="qa-table"><thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(String(r[k]||""))}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;}
+function nefArr(obj){if(!obj||typeof obj!=="object")return[];return Object.entries(obj).map(([k,v])=>({no:k,nama:v}));}
+function tryJ(s){try{return JSON.parse(s);}catch{return null;}}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+window._toggleCard=idx=>document.getElementById("jc"+idx)?.classList.toggle("open");
+
+function showEmpty(){document.getElementById("main-content").innerHTML=`<div class="state-box"><span class="state-icon">📭</span><div class="state-title">Belum Ada Jawaban</div><div class="state-desc">Dashboard update otomatis saat siswa mengisi LKPD.</div><button class="btn-action" onclick="window._injectDemo()" style="background:var(--amber-l);border:1.5px solid var(--amber-b);color:var(--amber)">🧪 Isi Data Uji Coba</button></div>`;}
+
+function showError(msg=""){document.getElementById("main-content").innerHTML=`<div class="state-box"><span class="state-icon">⚠️</span><div class="state-title">Gagal Terhubung</div><div class="state-desc">Pastikan Firebase Rules sudah diset ke test mode.</div><div class="error-box"><b style="font-size:12px;color:#9d174d">🔧 Cara Fix:</b><ol style="font-size:13px;line-height:2.2;margin-top:8px;padding-left:16px"><li>Buka console.firebase.google.com</li><li>Pilih project BioEkskresi</li><li>Realtime Database → Rules → Publish kode ini:</li></ol><div class="code-box">{ "rules": { ".read": true, ".write": true } }</div></div><button class="btn-action" onclick="location.reload()" style="background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff">🔄 Refresh Setelah Fix</button>${msg?`<div style="margin-top:8px;font-size:11px;color:var(--text3)">${msg}</div>`:""}</div>`;}
+
+window._injectDemo=async function(){
+  const now=new Date().toLocaleString("id-ID");
+  const demo=[
+    {p:"jawaban/Ginjal/kelompok_1/fase_1",d:{organ:"Ginjal",kelompok:"1",fase:1,timestamp:now,fakta:"1. Penyakit ginjal kronis menyerang 1 dari 10 orang
+2. Remaja Indonesia mulai terkena gangguan ginjal
+3. Hemodialisis dilakukan 2-3x seminggu
+4. Ginjal menyaring 180 liter darah per hari
+5. Minuman manis meningkatkan risiko batu ginjal",rumusan_masalah:"1. Bagaimana mekanisme kerusakan ginjal akibat minuman manis?
+2. Mengapa remaja semakin rentan gagal ginjal?"}},
+    {p:"jawaban/Ginjal/kelompok_1/fase_2",d:{organ:"Ginjal",kelompok:"1",fase:2,timestamp:now,rumusan_pilih:"Bagaimana mekanisme kerusakan ginjal akibat konsumsi minuman manis?",dampak_gangguan:"Gangguan filtrasi → protein lolos ke urin. Gangguan reabsorpsi → kehilangan elektrolit.",hemodialisis:"Diperlukan saat fungsi ginjal < 15%. Mesin menggantikan fungsi glomerulus."}},
+    {p:"jawaban/Ginjal/kelompok_2/fase_1",d:{organ:"Ginjal",kelompok:"2",fase:1,timestamp:now,fakta:"1. Nefron adalah unit fungsional ginjal
+2. Ada 1 juta nefron per ginjal
+3. Diabetes penyebab utama gagal ginjal
+4. Ginjal mengatur keseimbangan cairan
+5. Kurang minum meningkatkan risiko batu ginjal",rumusan_masalah:"1. Bagaimana hubungan diabetes dengan gagal ginjal?
+2. Apa yang terjadi pada nefron saat kadar gula tinggi?"}},
+    {p:"jawaban/Hati/kelompok_3/fase_1",d:{organ:"Hati",kelompok:"3",fase:1,timestamp:now,fakta:"1. Hati adalah kelenjar terbesar tubuh
+2. Alkohol merusak sel hepatosit
+3. Fatty liver dapat berkembang ke sirosis
+4. Hati memproduksi empedu
+5. Detoksifikasi racun terjadi di hati",rumusan_masalah:"1. Bagaimana alkohol merusak ekskresi hati?
+2. Mengapa sirosis memengaruhi keseimbangan tubuh?"}},
+    {p:"jawaban/Hati/kelompok_3/fase_2",d:{organ:"Hati",kelompok:"3",fase:2,timestamp:now,rumusan_pilih:"Bagaimana alkohol merusak fungsi ekskresi hati?",keterkaitan_gejala:"Kerusakan hati → empedu terganggu → kelelahan dan mual.",kebiasaan_hati:"Alkohol → asetaldehida toksik → stres oksidatif → fatty liver → fibrosis.",progresi_hati:"Fatty liver → Hepatitis → Fibrosis → Sirosis (ireversibel)."}},
+    {p:"jawaban/Paru-Paru/kelompok_5/fase_1",d:{organ:"Paru-Paru",kelompok:"5",fase:1,timestamp:now,fakta:"1. Paru mengekskresikan CO2 dan uap air
+2. Polusi udara merusak alveolus
+3. Pertukaran gas di alveolus
+4. Asma mempengaruhi ekskresi
+5. Rokok merusak silia saluran napas",rumusan_masalah:"1. Bagaimana polutan mengganggu ekskresi CO2?
+2. Mengapa perokok rentan gangguan paru?"}},
+    {p:"jawaban/Kulit/kelompok_6/fase_1",d:{organ:"Kulit",kelompok:"6",fase:1,timestamp:now,fakta:"1. Kulit mengeluarkan keringat berisi air dan garam
+2. Kelenjar ekrin tersebar di seluruh tubuh
+3. Termoregulasi via penguapan keringat
+4. Hipotalamus mengontrol suhu tubuh
+5. Keringat mencegah heat stroke",rumusan_masalah:"1. Bagaimana kulit berperan dalam ekskresi?
+2. Mengapa termoregulasi terganggu saat gangguan kulit?"}},
+  ];
+  try{for(const{p,d}of demo)await set(ref(db,p),d);alert("✅ Data uji coba berhasil!");}
+  catch(e){alert("❌ Gagal: "+e.message);}
+};
+
+window._clearData=async function(){
+  if(!confirm("Hapus SEMUA data dari Firebase?"))return;
+  try{await remove(ref(db,"jawaban"));alert("✅ Data dihapus!");}
+  catch(e){alert("❌ Gagal: "+e.message);}
+};
+</script>
+</body>
+</html>
